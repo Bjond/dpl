@@ -72,7 +72,17 @@ module DPL
         build_id = ENV.fetch('TRAVIS_JOB_ID', rand(9999).to_s)
         location = ENV.fetch('TRAVIS_BUILD_DIR' + '/../', '../')
         folder_name = branch + "_" + build_id
-        Dir.mkdir(location + folder_name)
+        folder_path = location + folder_name
+        Dir.mkdir(folder_path)
+        Dir.mkdir(folder_path + '/dependencies')
+        Dir.mkdir(folder_path + '/dependencies/jbosseap')
+        Dir.mkdir(folder_path + '/dependencies/jbosseap/deployments')
+        Dir.mkdir(folder_path + '/build_dependencies')
+        Dir.mkdir(folder_path + '/repo')
+        FileUtils.copy_entry('./', folder_path + '/repo')
+        if Dir.exists?('./deployments')
+          FileUtils.copy_entry('./deployments', folder_path + '/dependencies/jbosseap/deployments')
+        end
       end
 
       def restart
