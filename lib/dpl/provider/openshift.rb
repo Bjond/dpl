@@ -5,6 +5,7 @@ module DPL
       # See https://github.com/openshift/rhc/pull/600
       requires 'httpclient', version: '~> 2.4.0'
       requires 'rhc', version: '~> 1.25.3'
+      require 'fileutils'
       #requires 'archive-tar', version: '~> 0.9.0'
 
       def initialize(context, options)
@@ -73,12 +74,11 @@ module DPL
         location = ENV.fetch('TRAVIS_BUILD_DIR' + '/../', '../')
         folder_name = branch + "_" + build_id
         folder_path = location + folder_name
-        Dir.mkdir(folder_path)
-        Dir.mkdir(folder_path + '/dependencies')
-        Dir.mkdir(folder_path + '/dependencies/jbosseap')
-        Dir.mkdir(folder_path + '/dependencies/jbosseap/deployments')
-        Dir.mkdir(folder_path + '/build_dependencies')
-        Dir.mkdir(folder_path + '/repo')
+        deployments_dir = folder_path + '/dependencies/jbosseap/deployments'
+        build_dependencies_dir = folder_path + '/build_dependencies'
+        repo_dir = folder_path + '/repo'
+        folders = [deployments_dir, build_dependencies_dir, repo_dir]
+        FileUtils.mkdir_p folders
         FileUtils.copy_entry('./', folder_path + '/repo')
         if Dir.exists?('./deployments')
           FileUtils.copy_entry('./deployments', folder_path + '/dependencies/jbosseap/deployments')
