@@ -10,6 +10,7 @@ end
 group :openshift do
   gem 'rhc'
   gem 'httpclient'
+  gem 'archive-tar'
 end
 
 group :appfog do

@@ -5,6 +5,7 @@ module DPL
       # See https://github.com/openshift/rhc/pull/600
       requires 'httpclient', version: '~> 2.4.0'
       requires 'rhc', version: '~> 1.25.3'
+      #requires 'archive-tar', version: '~> 0.9.0'
 
       def initialize(context, options)
         super
@@ -41,13 +42,37 @@ module DPL
       end
 
       def push_app
-        if @deployment_branch
+        if app.deployment_type == "binary"
+          log "Application deployment type is set to 'binary'; deploying build results."
+          binary_deploy
+        elsif @deployment_branch
           log "deployment_branch detected: #{@deployment_branch}"
           app.deployment_branch = @deployment_branch
           context.shell "git push #{app.git_url} -f #{app.deployment_branch}"
         else
           context.shell "git push #{app.git_url} -f"
+          puts "Pushing app."
         end
+      end
+
+      def binary_deploy
+        compile_tarball
+      end
+
+      ##
+      # build_dependencies/
+      # dependencies/
+      #    jbosseap/ [need to trsanlate this one]
+      #        deployments/
+      #            [binaries]
+      # repo/
+      #    .openshift/
+      def compile_tarball
+        branch = ENV.fetch('TRAVIS_BRANCH', 'application')
+        build_id = ENV.fetch('TRAVIS_JOB_ID', rand(9999).to_s)
+        location = ENV.fetch('TRAVIS_BUILD_DIR' + '/../', '../')
+        folder_name = branch + "_" + build_id
+        Dir.mkdir(location + folder_name)
       end
 
       def restart

@@ -1,5 +1,6 @@
 require 'spec_helper'
 require 'rhc'
+require 'archive-tar'
 require 'dpl/provider/openshift'
 
 describe DPL::Provider::Openshift do
